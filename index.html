@@ -3,84 +3,136 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EMR v3 - Complete</title>
+<title>EMR PRO</title>
 
 <style>
 :root{
-  --green:#1D9E75;
-  --purple:#534AB7;
-  --pink:#D4537E;
-  --bg:#F5F7FB;
+  --g:#1D9E75;
+  --p:#534AB7;
+  --r:#D4537E;
+  --bg:#F4F6FA;
 }
 
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
+}
 
-body{background:var(--bg);}
+body{
+background:var(--bg);
+}
 
 header{
-  background:linear-gradient(90deg,var(--green),var(--purple),var(--pink));
-  color:white;
-  text-align:center;
-  padding:15px;
+background:linear-gradient(90deg,var(--g),var(--p),var(--r));
+color:white;
+text-align:center;
+padding:14px;
 }
 
-.hidden{display:none;}
-
+/* LOGIN */
 #login{
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
 }
 
 .box{
-  background:white;
-  padding:20px;
-  width:320px;
-  border-radius:10px;
+background:white;
+padding:20px;
+width:320px;
+border-radius:12px;
+box-shadow:0 10px 25px rgba(0,0,0,.1);
 }
 
-input,select{
-  width:100%;
-  padding:10px;
-  margin:6px 0;
+input{
+width:100%;
+padding:10px;
+margin:6px 0;
+border-radius:8px;
+border:1px solid #ddd;
 }
 
 button{
-  width:100%;
-  padding:10px;
-  background:var(--purple);
-  color:white;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
+width:100%;
+padding:10px;
+border:none;
+border-radius:8px;
+background:var(--p);
+color:white;
+cursor:pointer;
 }
 
-.container{display:flex;min-height:100vh;}
+/* APP */
+.hidden{display:none;}
 
+.app{
+display:flex;
+height:100vh;
+}
+
+/* SIDEBAR */
 aside{
-  width:220px;
-  background:white;
-  padding:15px;
+width:240px;
+background:white;
+padding:15px;
+box-shadow:2px 0 10px rgba(0,0,0,.05);
 }
 
-main{flex:1;padding:20px;}
+aside button{
+margin-top:8px;
+background:var(--p);
+}
 
+/* MAIN */
+main{
+flex:1;
+padding:20px;
+overflow:auto;
+}
+
+/* CARDS */
 .card{
-  background:white;
-  padding:15px;
-  margin-bottom:15px;
-  border-radius:10px;
+background:white;
+padding:15px;
+border-radius:12px;
+margin-bottom:15px;
+box-shadow:0 4px 15px rgba(0,0,0,.05);
 }
 
-/* BADGES */
+/* GRID */
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:15px;
+}
+
+/* BADGE */
 .badge{
-  background:var(--pink);
-  color:white;
-  padding:5px 10px;
-  border-radius:20px;
-  display:inline-block;
-  margin:3px;
+background:var(--r);
+color:white;
+padding:5px 10px;
+border-radius:20px;
+display:inline-block;
+margin:3px;
+font-size:12px;
+}
+
+/* PROGRESS */
+.bar{
+height:12px;
+background:#ddd;
+border-radius:10px;
+overflow:hidden;
+}
+
+.fill{
+height:100%;
+width:0%;
+background:var(--g);
+transition:.3s;
 }
 </style>
 </head>
@@ -88,7 +140,7 @@ main{flex:1;padding:20px;}
 <body>
 
 <header>
-<h2>EMR - Effort Motivation Réussite</h2>
+<h2>EMR PRO</h2>
 </header>
 
 <!-- LOGIN -->
@@ -102,19 +154,19 @@ main{flex:1;padding:20px;}
 </div>
 
 <!-- APP -->
-<div id="app" class="hidden container">
+<div id="app" class="hidden app">
 
 <aside>
 <h3>Menu</h3>
 
-<button onclick="show('dash')">Dashboard</button>
+<button onclick="nav('dash')">Dashboard</button>
 <button onclick="load('maths')">Maths</button>
 <button onclick="load('francais')">Français</button>
 <button onclick="load('histoire')">Histoire</button>
 <button onclick="load('sciences')">Sciences</button>
-<button onclick="show('planning')">Planning</button>
-
+<button onclick="nav('planning')">Planning</button>
 <button onclick="logout()">Déconnexion</button>
+
 </aside>
 
 <main>
@@ -125,7 +177,11 @@ main{flex:1;padding:20px;}
 <div class="card">
 <h2 id="name"></h2>
 <p>XP: <span id="xp"></span></p>
-<p>Niveau: <span id="level"></span></p>
+<p>Niveau: <span id="lvl"></span></p>
+
+<div class="bar">
+<div id="prog" class="fill"></div>
+</div>
 </div>
 
 <div class="card">
@@ -136,27 +192,23 @@ main{flex:1;padding:20px;}
 </div>
 
 <!-- EXERCICES -->
-<div id="subject" class="card hidden"></div>
+<div id="ex" class="card hidden"></div>
 
 <!-- PLANNING -->
-<div id="planning" class="hidden">
+<div id="plan" class="hidden">
 
 <div class="card">
-<h3>Planning de révision</h3>
-
-<div id="planningList"></div>
-
+<h3>Planning</h3>
+<div id="list"></div>
 </div>
 
-<div id="adminPanel" class="card hidden">
-<h3>Admin - ajouter séance</h3>
-
-<input id="day" placeholder="Jour">
-<input id="time" placeholder="Heure">
-<input id="place" placeholder="Lieu">
-<input id="group" placeholder="Groupe A/B">
-<button onclick="addSession()">Ajouter</button>
-
+<div id="adminPlan" class="card hidden">
+<h3>Admin planning</h3>
+<input id="d" placeholder="Jour">
+<input id="t" placeholder="Heure">
+<input id="l" placeholder="Lieu">
+<input id="g" placeholder="Groupe">
+<button onclick="add()">Ajouter</button>
 </div>
 
 </div>
@@ -168,7 +220,7 @@ main{flex:1;padding:20px;}
 
 /* ================= DATA ================= */
 
-const KEY="EMR_V3";
+const KEY="EMRPRO";
 
 if(!localStorage.getItem(KEY)){
 localStorage.setItem(KEY,JSON.stringify({
@@ -182,17 +234,17 @@ users:[
 ],
 exercises:{
 maths:[
-{q:"5 x 5 ?",a:["10","20","25","30"],r:2},
-{q:"12 - 7 ?",a:["5","6","4","3"],r:0}
+{q:"6 x 6 ?",a:["30","36","40","24"],r:1},
+{q:"9-4 ?",a:["5","4","3","6"],r:0}
 ],
 francais:[
-{q:"verbe dans 'je mange' ?",a:["mange","je","pomme","une"],r:0}
+{q:"verbe 'je parle' ?",a:["parle","je","tu","ma"],r:0}
 ],
 histoire:[
-{q:"1789 ?",a:["Révolution","WW1","Rome","2000"],r:0}
+{q:"1789 ?",a:["Révolution","Empire","WW2","Rome"],r:0}
 ],
 sciences:[
-{q:"eau bout à ?",a:["100°C","50°C","0°C","200°C"],r:0}
+{q:"eau bout ?",a:["100°C","50°C","0°C","20°C"],r:0}
 ]
 },
 progress:{},
@@ -202,8 +254,8 @@ planning:[]
 
 let data=JSON.parse(localStorage.getItem(KEY));
 let user=null;
-let subject=null;
-let index=0;
+let subj=null;
+let i=0;
 
 /* ================= LOGIN ================= */
 
@@ -220,20 +272,22 @@ document.getElementById("login").classList.add("hidden");
 document.getElementById("app").classList.remove("hidden");
 
 render();
-renderPlanning();
+renderPlan();
+
 }
 
-/* ================= DASHBOARD ================= */
+/* ================= NAV ================= */
 
-function show(id){
+function nav(x){
 
 document.querySelectorAll("main > div").forEach(d=>d.classList.add("hidden"));
+document.getElementById(x).classList.remove("hidden");
 
-document.getElementById(id).classList.remove("hidden");
-
-if(id==="planning") renderPlanning();
+if(x==="plan") renderPlan();
 
 }
+
+/* ================= DASH ================= */
 
 function render(){
 
@@ -241,7 +295,11 @@ document.getElementById("name").innerText=user.name;
 
 document.getElementById("xp").innerText=user.xp;
 
-document.getElementById("level").innerText=Math.floor(user.xp/100)+1;
+let lvl=Math.floor(user.xp/100)+1;
+
+document.getElementById("lvl").innerText=lvl;
+
+document.getElementById("prog").style.width=(user.xp%100)+"%";
 
 renderBadges();
 
@@ -263,56 +321,52 @@ b.length?b.map(x=>`<span class="badge">${x}</span>`).join(""):"Aucun badge";
 
 }
 
-/* ================= EXERCICES ================= */
+/* ================= EX ================= */
 
 function load(s){
 
-subject=s;
-index=0;
+subj=s;
+i=0;
 
-document.getElementById("dash").classList.add("hidden");
-document.getElementById("subject").classList.remove("hidden");
-
-renderExercise();
+nav("ex");
+renderEx();
 
 }
 
-function renderExercise(){
+function renderEx(){
 
-let ex=data.exercises[subject][index];
+let e=data.exercises[subj][i];
 
-if(!ex){
-document.getElementById("subject").innerHTML="<h3>Terminé ✔</h3>";
+if(!e){
+document.getElementById("ex").innerHTML="<h3>Terminé ✔</h3>";
 return;
 }
 
-document.getElementById("subject").innerHTML=`
-<h2>${subject.toUpperCase()}</h2>
-<p><b>${ex.q}</b></p>
+document.getElementById("ex").innerHTML=`
+<h2>${subj.toUpperCase()}</h2>
+<p><b>${e.q}</b></p>
 
-${ex.a.map((x,i)=>
-`<button onclick="answer(${i})">${x}</button><br><br>`
+${e.a.map((x,j)=>
+`<button onclick="ans(${j})">${x}</button><br><br>`
 ).join("")}
 `;
 
 }
 
-function answer(i){
+function ans(j){
 
-let ex=data.exercises[subject][index];
+let e=data.exercises[subj][i];
 
-if(i===ex.r){
+if(j===e.r){
 user.xp+=10;
 alert("+10 XP");
-}else{
-alert("Faux");
-}
+}else alert("Faux");
 
-index++;
+i++;
 
 save();
 render();
-renderExercise();
+renderEx();
 
 }
 
@@ -329,37 +383,35 @@ localStorage.setItem(KEY,JSON.stringify(data));
 
 /* ================= PLANNING ================= */
 
-function renderPlanning(){
+function renderPlan(){
 
-let list=document.getElementById("planningList");
+let list=data.planning.filter(p=>p.group===user.group || user.role==="admin");
 
-let sessions=data.planning.filter(p=>p.group===user.group || user.role==="admin");
+document.getElementById("list").innerHTML=
+list.map(p=>`
+<div class="card">
+<b>${p.day}</b> - ${p.time}<br>
+${p.place} | ${p.group}
+</div>
+`).join("");
 
-list.innerHTML=sessions.map(s=>
-`<div class="card">
-<b>${s.day}</b> - ${s.time}<br>
-${s.place} | Groupe ${s.group}
-</div>`
-).join("");
-
-if(user.role==="admin"){
-document.getElementById("adminPanel").classList.remove("hidden");
-}
+if(user.role==="admin")
+document.getElementById("adminPlan").classList.remove("hidden");
 
 }
 
-function addSession(){
+function add(){
 
 data.planning.push({
-day:day.value,
-time:time.value,
-place:place.value,
-group:group.value
+day:d.value,
+time:t.value,
+place:l.value,
+group:g.value
 });
 
 localStorage.setItem(KEY,JSON.stringify(data));
 
-renderPlanning();
+renderPlan();
 
 }
 
