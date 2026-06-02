@@ -3,62 +3,84 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EMR - Effort Motivation Réussite</title>
+<title>EMR v3 - Complete</title>
 
 <style>
 :root{
-  --vert:#1D9E75;
-  --violet:#534AB7;
-  --rose:#D4537E;
-  --gris:#f5f7fb;
+  --green:#1D9E75;
+  --purple:#534AB7;
+  --pink:#D4537E;
+  --bg:#F5F7FB;
 }
 
-body{
-  margin:0;
-  font-family: Arial, sans-serif;
-  background:var(--gris);
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
+
+body{background:var(--bg);}
 
 header{
-  background:linear-gradient(90deg,var(--vert),var(--violet),var(--rose));
+  background:linear-gradient(90deg,var(--green),var(--purple),var(--pink));
   color:white;
-  padding:15px;
   text-align:center;
+  padding:15px;
 }
 
-.container{ padding:20px; }
-
 .hidden{display:none;}
+
+#login{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.box{
+  background:white;
+  padding:20px;
+  width:320px;
+  border-radius:10px;
+}
+
+input,select{
+  width:100%;
+  padding:10px;
+  margin:6px 0;
+}
+
+button{
+  width:100%;
+  padding:10px;
+  background:var(--purple);
+  color:white;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.container{display:flex;min-height:100vh;}
+
+aside{
+  width:220px;
+  background:white;
+  padding:15px;
+}
+
+main{flex:1;padding:20px;}
 
 .card{
   background:white;
   padding:15px;
   margin-bottom:15px;
   border-radius:10px;
-  box-shadow:0 3px 10px rgba(0,0,0,0.08);
 }
 
-button{
-  padding:10px;
-  border:none;
-  border-radius:6px;
-  background:var(--violet);
+/* BADGES */
+.badge{
+  background:var(--pink);
   color:white;
-  cursor:pointer;
-}
-
-button:hover{opacity:0.9;}
-
-.progress-bar{
-  height:12px;
-  background:#ddd;
-  border-radius:10px;
-  overflow:hidden;
-}
-
-.progress{
-  height:100%;
-  background:var(--vert);
+  padding:5px 10px;
+  border-radius:20px;
+  display:inline-block;
+  margin:3px;
 }
 </style>
 </head>
@@ -66,224 +88,287 @@ button:hover{opacity:0.9;}
 <body>
 
 <header>
-<h1>EMR - Effort · Motivation · Réussite</h1>
+<h2>EMR - Effort Motivation Réussite</h2>
 </header>
 
 <!-- LOGIN -->
-<div id="loginPage" class="container">
-  <div class="card">
-    <h3>Connexion</h3>
-    <input id="username" placeholder="Identifiant"><br><br>
-    <input id="password" type="password" placeholder="Mot de passe"><br><br>
-    <button onclick="login()">Se connecter</button>
-  </div>
+<div id="login">
+<div class="box">
+<h3>Connexion</h3>
+<input id="u" placeholder="identifiant">
+<input id="p" type="password" placeholder="mot de passe">
+<button onclick="login()">Connexion</button>
+</div>
 </div>
 
 <!-- APP -->
 <div id="app" class="hidden container">
 
-  <div class="card">
-    <button onclick="showView('revision')">Accueil Révision</button>
-    <button onclick="showView('dashboard')">Mes exercices</button>
-    <button onclick="logout()">Déconnexion</button>
-  </div>
+<aside>
+<h3>Menu</h3>
 
-  <!-- ================= REVISION PAGE ================= -->
-  <div id="revision" class="view">
+<button onclick="show('dash')">Dashboard</button>
+<button onclick="load('maths')">Maths</button>
+<button onclick="load('francais')">Français</button>
+<button onclick="load('histoire')">Histoire</button>
+<button onclick="load('sciences')">Sciences</button>
+<button onclick="show('planning')">Planning</button>
 
-    <div class="card">
-      <h2>📚 Page de révision</h2>
-      <p>Choisis une matière pour commencer tes exercices</p>
-    </div>
+<button onclick="logout()">Déconnexion</button>
+</aside>
 
-    <div class="card">
-      <h3>Mathématiques</h3>
-      <button onclick="showView('dashboard')">Commencer</button>
-    </div>
+<main>
 
-    <div class="card">
-      <h3>Français</h3>
-      <button onclick="showView('dashboard')">Commencer</button>
-    </div>
+<!-- DASHBOARD -->
+<div id="dash">
 
-    <div class="card">
-      <h3>Histoire-Géographie</h3>
-      <button onclick="showView('dashboard')">Commencer</button>
-    </div>
+<div class="card">
+<h2 id="name"></h2>
+<p>XP: <span id="xp"></span></p>
+<p>Niveau: <span id="level"></span></p>
+</div>
 
-    <div class="card">
-      <h3>Sciences</h3>
-      <button onclick="showView('dashboard')">Commencer</button>
-    </div>
-
-  </div>
-
-  <!-- ================= DASHBOARD ================= -->
-  <div id="dashboard" class="view hidden">
-
-    <div class="card">
-      <h2 id="welcome"></h2>
-
-      <div class="progress-bar">
-        <div id="progressGlobal" class="progress"></div>
-      </div>
-
-      <p id="progressText"></p>
-    </div>
-
-    <div id="categories"></div>
-
-  </div>
+<div class="card">
+<h3>Badges</h3>
+<div id="badges"></div>
+</div>
 
 </div>
 
+<!-- EXERCICES -->
+<div id="subject" class="card hidden"></div>
+
+<!-- PLANNING -->
+<div id="planning" class="hidden">
+
+<div class="card">
+<h3>Planning de révision</h3>
+
+<div id="planningList"></div>
+
+</div>
+
+<div id="adminPanel" class="card hidden">
+<h3>Admin - ajouter séance</h3>
+
+<input id="day" placeholder="Jour">
+<input id="time" placeholder="Heure">
+<input id="place" placeholder="Lieu">
+<input id="group" placeholder="Groupe A/B">
+<button onclick="addSession()">Ajouter</button>
+
+</div>
+
+</div>
+
+</main>
+</div>
+
 <script>
+
 /* ================= DATA ================= */
-let data = JSON.parse(localStorage.getItem("EMR_data"));
 
-if(!data){
-  data = {
-    users:[
-      {id:1, username:"admin", password:"admin1234", role:"admin"},
-      {id:2, username:"louis", password:"1234", firstName:"Louis"},
-      {id:3, username:"emma", password:"1234", firstName:"Emma"},
-      {id:4, username:"nathan", password:"1234", firstName:"Nathan"},
-      {id:5, username:"jade", password:"1234", firstName:"Jade"},
-      {id:6, username:"ines", password:"1234", firstName:"Inès"},
-    ],
-    exercises:{
-      maths:[
-        {id:"m1", title:"Calcul mental", desc:"Entraînement rapide"},
-        {id:"m2", title:"Fractions", desc:"Opérations"},
-        {id:"m3", title:"Équations", desc:"Résolution"}
-      ],
-      francais:[
-        {id:"f1", title:"Grammaire", desc:"Analyse"},
-        {id:"f2", title:"Conjugaison", desc:"Temps verbaux"},
-        {id:"f3", title:"Dictée", desc:"Orthographe"}
-      ],
-      histoire:[
-        {id:"h1", title:"Révolution", desc:"1789"},
-        {id:"h2", title:"Guerres", desc:"XXe siècle"},
-        {id:"h3", title:"Europe", desc:"UE"}
-      ],
-      sciences:[
-        {id:"s1", title:"Électricité", desc:"Circuits"},
-        {id:"s2", title:"Atomes", desc:"Structure"},
-        {id:"s3", title:"Énergie", desc:"Transformations"}
-      ]
-    },
-    progress:{}
-  };
+const KEY="EMR_V3";
 
-  localStorage.setItem("EMR_data", JSON.stringify(data));
+if(!localStorage.getItem(KEY)){
+localStorage.setItem(KEY,JSON.stringify({
+users:[
+{u:"admin",p:"admin1234",name:"Admin",role:"admin",xp:0,group:"A"},
+{u:"louis",p:"1234",name:"Louis",xp:0,group:"A"},
+{u:"emma",p:"1234",name:"Emma",xp:0,group:"A"},
+{u:"nathan",p:"1234",name:"Nathan",xp:0,group:"B"},
+{u:"jade",p:"1234",name:"Jade",xp:0,group:"B"},
+{u:"ines",p:"1234",name:"Inès",xp:0,group:"A"}
+],
+exercises:{
+maths:[
+{q:"5 x 5 ?",a:["10","20","25","30"],r:2},
+{q:"12 - 7 ?",a:["5","6","4","3"],r:0}
+],
+francais:[
+{q:"verbe dans 'je mange' ?",a:["mange","je","pomme","une"],r:0}
+],
+histoire:[
+{q:"1789 ?",a:["Révolution","WW1","Rome","2000"],r:0}
+],
+sciences:[
+{q:"eau bout à ?",a:["100°C","50°C","0°C","200°C"],r:0}
+]
+},
+progress:{},
+planning:[]
+}));
 }
 
-let currentUser;
+let data=JSON.parse(localStorage.getItem(KEY));
+let user=null;
+let subject=null;
+let index=0;
 
 /* ================= LOGIN ================= */
+
 function login(){
-  const u=document.getElementById("username").value;
-  const p=document.getElementById("password").value;
 
-  const user=data.users.find(x=>x.username===u && x.password===p);
+let u=document.getElementById("u").value;
+let p=document.getElementById("p").value;
 
-  if(!user){
-    alert("Erreur");
-    return;
-  }
+user=data.users.find(x=>x.u===u && x.p===p);
 
-  currentUser=user;
-  localStorage.setItem("EMR_user",JSON.stringify(user));
+if(!user){alert("Erreur");return;}
 
-  document.getElementById("loginPage").classList.add("hidden");
-  document.getElementById("app").classList.remove("hidden");
+document.getElementById("login").classList.add("hidden");
+document.getElementById("app").classList.remove("hidden");
 
-  showView("revision"); // 🔥 CHANGEMENT ICI
-  render();
-}
-
-/* ================= NAV ================= */
-function showView(v){
-  document.querySelectorAll(".view").forEach(x=>x.classList.add("hidden"));
-  document.getElementById(v).classList.remove("hidden");
+render();
+renderPlanning();
 }
 
 /* ================= DASHBOARD ================= */
+
+function show(id){
+
+document.querySelectorAll("main > div").forEach(d=>d.classList.add("hidden"));
+
+document.getElementById(id).classList.remove("hidden");
+
+if(id==="planning") renderPlanning();
+
+}
+
 function render(){
-  document.getElementById("welcome").innerText =
-    "Bienvenue " + currentUser.firstName;
 
-  let total=0, done=0;
+document.getElementById("name").innerText=user.name;
 
-  Object.values(data.exercises).forEach(cat=>{
-    cat.forEach(e=>{
-      total++;
-      if(data.progress[currentUser.username]?.[e.id]) done++;
-    });
-  });
+document.getElementById("xp").innerText=user.xp;
 
-  let percent=Math.round((done/total)*100)||0;
+document.getElementById("level").innerText=Math.floor(user.xp/100)+1;
 
-  document.getElementById("progressGlobal").style.width=percent+"%";
-  document.getElementById("progressText").innerText=percent+"% complété";
+renderBadges();
 
-  renderCategories();
+}
+
+/* ================= BADGES ================= */
+
+function renderBadges(){
+
+let b=[];
+
+if(user.xp>=20) b.push("Débutant");
+if(user.xp>=50) b.push("Motivé");
+if(user.xp>=100) b.push("Sérieux");
+if(user.xp>=200) b.push("Expert");
+
+document.getElementById("badges").innerHTML=
+b.length?b.map(x=>`<span class="badge">${x}</span>`).join(""):"Aucun badge";
+
 }
 
 /* ================= EXERCICES ================= */
-function toggle(id){
-  if(!data.progress[currentUser.username])
-    data.progress[currentUser.username]={};
 
-  data.progress[currentUser.username][id]=
-    !data.progress[currentUser.username][id];
+function load(s){
 
-  localStorage.setItem("EMR_data",JSON.stringify(data));
-  render();
+subject=s;
+index=0;
+
+document.getElementById("dash").classList.add("hidden");
+document.getElementById("subject").classList.remove("hidden");
+
+renderExercise();
+
 }
 
-function renderCategories(){
-  const c=document.getElementById("categories");
-  c.innerHTML="";
+function renderExercise(){
 
-  for(let cat in data.exercises){
-    let div=document.createElement("div");
-    div.className="card";
+let ex=data.exercises[subject][index];
 
-    div.innerHTML="<h3>"+cat.toUpperCase()+"</h3>";
+if(!ex){
+document.getElementById("subject").innerHTML="<h3>Terminé ✔</h3>";
+return;
+}
 
-    data.exercises[cat].forEach(e=>{
-      let done=data.progress[currentUser.username]?.[e.id];
+document.getElementById("subject").innerHTML=`
+<h2>${subject.toUpperCase()}</h2>
+<p><b>${ex.q}</b></p>
 
-      let ex=document.createElement("div");
-      ex.innerHTML=`
-        <p><b>${e.title}</b> - ${e.desc}</p>
-        <button onclick="toggle('${e.id}')">
-          ${done?"Complété":"Commencer"}
-        </button>
-      `;
-      div.appendChild(ex);
-    });
+${ex.a.map((x,i)=>
+`<button onclick="answer(${i})">${x}</button><br><br>`
+).join("")}
+`;
 
-    c.appendChild(div);
-  }
+}
+
+function answer(i){
+
+let ex=data.exercises[subject][index];
+
+if(i===ex.r){
+user.xp+=10;
+alert("+10 XP");
+}else{
+alert("Faux");
+}
+
+index++;
+
+save();
+render();
+renderExercise();
+
+}
+
+/* ================= SAVE ================= */
+
+function save(){
+
+let u=data.users.find(x=>x.u===user.u);
+u.xp=user.xp;
+
+localStorage.setItem(KEY,JSON.stringify(data));
+
+}
+
+/* ================= PLANNING ================= */
+
+function renderPlanning(){
+
+let list=document.getElementById("planningList");
+
+let sessions=data.planning.filter(p=>p.group===user.group || user.role==="admin");
+
+list.innerHTML=sessions.map(s=>
+`<div class="card">
+<b>${s.day}</b> - ${s.time}<br>
+${s.place} | Groupe ${s.group}
+</div>`
+).join("");
+
+if(user.role==="admin"){
+document.getElementById("adminPanel").classList.remove("hidden");
+}
+
+}
+
+function addSession(){
+
+data.planning.push({
+day:day.value,
+time:time.value,
+place:place.value,
+group:group.value
+});
+
+localStorage.setItem(KEY,JSON.stringify(data));
+
+renderPlanning();
+
 }
 
 /* ================= LOGOUT ================= */
+
 function logout(){
-  localStorage.removeItem("EMR_user");
-  location.reload();
+location.reload();
 }
 
-/* auto login */
-if(localStorage.getItem("EMR_user")){
-  currentUser=JSON.parse(localStorage.getItem("EMR_user"));
-  document.getElementById("loginPage").classList.add("hidden");
-  document.getElementById("app").classList.remove("hidden");
-  showView("revision");
-  render();
-}
 </script>
 
 </body>
